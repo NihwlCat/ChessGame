@@ -1,8 +1,8 @@
 package boardgame;
 
 public class Position {
-    private int linha;
-    private int coluna;
+    private int linha; // 2
+    private int coluna; // 1
 
     public void setValues(int linha, int coluna){
         this.linha = linha;

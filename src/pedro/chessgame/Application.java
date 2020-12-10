@@ -1,10 +1,11 @@
 package pedro.chessgame;
 
-import boardgame.Position;
+import chess.ChessMatch;
+import chess.Rook;
 
 public class Application {
     public static void main(String[] args) {
-        Position p = new Position(1,3);
-        System.out.println(p);
+        ChessMatch cm = new ChessMatch();
+        UI.printBoard(cm.getPieces());
     }
 }
