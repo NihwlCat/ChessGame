@@ -61,5 +61,18 @@ public class Board { // As linhas do tabuleiro não devem ser alteradas após a 
         return piece(p) != null;
     }
 
+    public Piece removePiece(Position p){
+        if(!positionExists(p)){
+            throw new BoardException(String.format("Posição [%d] [%d] não existe no tabuleiro!",p.getLinha(),p.getColuna()));
+        }
+        if(piece(p) == null){ // Caso a posição esteja vazia retornar null
+            return null;
+        }
+        Piece aux = piece(p);
+        aux.pos = null;
+        pieces[p.getLinha()][p.getColuna()] = null;
+        return aux;
+    }
+
 
 }
