@@ -1,11 +1,15 @@
 package pedro.chessgame;
 
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.Color;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 
 public class UI {
@@ -50,12 +54,37 @@ public class UI {
 
     }
 
+    public static void printBoard(ChessPiece[][] cp, boolean[][] pm ){
+        for(int i=0;i<cp.length;i++){
+            System.out.print(8-i + " ");
+            for(int j=0;j<cp.length;j++){
+                printPiece(cp[i][j], pm[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println("  a b c d e f g h");
+
+
+    }
+
+    public static void printMatch(ChessMatch cm, List<ChessPiece> cap){
+        printBoard(cm.getPieces());
+        System.out.println();
+        printPecasCapturadas(cap);
+        System.out.println();
+        System.out.println("Turno: " + cm.getTurn());
+        System.out.println("Esperando jogada... " + cm.getJogAtual());
+        if(cm.getCheque()){
+            System.out.println("CHEQUE!");
+        }
+    }
+
 
     public static void printBoard(ChessPiece[][] cp){
         for(int i=0;i<cp.length;i++){
             System.out.print(8-i + " ");
             for(int j=0;j<cp.length;j++){
-                printPiece(cp[i][j]);
+                printPiece(cp[i][j],false);
             }
             System.out.println();
         }
@@ -65,9 +94,12 @@ public class UI {
 
     // BoilerPlate para cores no console
 
-    public static void printPiece(ChessPiece cp){
+    public static void printPiece(ChessPiece cp, boolean background){
+        if(background){
+            System.out.print(ANSI_CYAN_BACKGROUND);
+        }
         if (cp == null) {
-            System.out.print("-");
+            System.out.print("-" + ANSI_RESET);
         }
         else {
             if (cp.getColor() == Color.WHITE) {
@@ -79,6 +111,25 @@ public class UI {
         }
         System.out.print(" ");
     }
+
+    private static void printPecasCapturadas(List<ChessPiece> capturadas){
+        // Predicato na função lambda para filtrar elementos a serem inseridos em brancas.
+        List<ChessPiece> brancas = capturadas.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
+        List<ChessPiece> pretas = capturadas.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
+
+        System.out.println("PEÇAS CAPTURADAS: ");
+        System.out.print("BRANCAS: ");
+        System.out.print(ANSI_WHITE);
+        System.out.println(Arrays.toString((brancas.toArray())));
+        System.out.print(ANSI_RESET);
+
+        System.out.print("PRETAS: ");
+        System.out.print(ANSI_YELLOW);
+        System.out.println(Arrays.toString((pretas.toArray())));
+        System.out.print(ANSI_RESET);
+    }
+
+
         /*if (cp == null){
             System.out.print("-");
         } else {

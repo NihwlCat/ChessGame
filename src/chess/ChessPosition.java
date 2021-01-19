@@ -21,7 +21,7 @@ public class ChessPosition {
     }
 
     protected static ChessPosition fromPosition(Position p){
-        return new ChessPosition((char)('a' - p.getColuna()), 8 - p.getLinha()); // Casting para indicar que a operação de subtração da coluna é para um char.
+        return new ChessPosition((char)('a' + p.getColuna()), 8 - p.getLinha()); // Casting para indicar que a operação de subtração da coluna é para um char.
 
     }
 
