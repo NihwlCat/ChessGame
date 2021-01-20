@@ -15,6 +15,7 @@ public class ChessMatch {
     private int turn;
     private Color jogAtual;
     private boolean cheque;
+    private boolean chequeMate;
 
     private List<ChessPiece> pecasTabuleiro = new ArrayList<>();
     private List<ChessPiece> pecasCapturadas = new ArrayList<>();
@@ -29,6 +30,10 @@ public class ChessMatch {
 
     public boolean getCheque(){
         return cheque;
+    }
+
+    public boolean getChequeMate(){
+        return chequeMate;
     }
 
     public int getTurn(){
@@ -65,8 +70,11 @@ public class ChessMatch {
 
         cheque = (testeChuca(oponente(jogAtual))) ? true : false;
 
-
-        nextTurn();
+        if (testeChequeMate(oponente(jogAtual))){
+            chequeMate = true;
+        } else {
+            nextTurn();
+        }
 
         return (ChessPiece) peca_capturada;
 
@@ -105,7 +113,8 @@ public class ChessMatch {
     }
 
     private Piece makeMove(Position origem, Position destino){
-        Piece p = board.removePiece(origem);
+        ChessPiece p = (ChessPiece)board.removePiece(origem);
+        p.plusMove();
         Piece t = board.removePiece(destino);
 
         if(t != null){
@@ -114,11 +123,30 @@ public class ChessMatch {
         }
 
         board.placePiece(p,destino);
+        // ROCADA PEQUENA
+        if(p instanceof King && destino.getColuna() == origem.getColuna() + 2 ){
+            Position sT = new Position(origem.getLinha(), origem.getColuna() +3);
+            Position tT = new Position(origem.getLinha(), origem.getColuna() +1);
+            ChessPiece rook = (ChessPiece)board.removePiece(sT);
+            board.placePiece(rook, tT);
+            rook.plusMove();
+        }
+
+        // ROCADA GRANDE
+        if(p instanceof King && destino.getColuna() == origem.getColuna() - 2 ){
+            Position sT = new Position(origem.getLinha(), origem.getColuna() -4);
+            Position tT = new Position(origem.getLinha(), origem.getColuna() -1);
+            ChessPiece rook = (ChessPiece)board.removePiece(sT);
+            board.placePiece(rook, tT);
+            rook.plusMove();
+        }
         return t;
     }
 
     private void undoMove(Position origem, Position destino, Piece cap){
-        Piece p = board.removePiece(destino);
+        ChessPiece p = (ChessPiece)board.removePiece(destino);
+        p.minusMove();
+
         board.placePiece(p, origem);
 
         if(cap != null){
@@ -127,6 +155,24 @@ public class ChessMatch {
             pecasTabuleiro.add((ChessPiece)cap);
         }
 
+        // ROCADA PEQUENA - DESFAZER
+        if(p instanceof King && destino.getColuna() == origem.getColuna() +2){
+            Position sT = new Position(origem.getLinha(), origem.getColuna() +3);
+            Position tT = new Position(origem.getLinha(), origem.getColuna() +1);
+            ChessPiece rook = (ChessPiece)board.removePiece(tT);
+            board.placePiece(rook, sT);
+            rook.minusMove();
+        }
+
+        // ROCADA GRANDE - DESFAZER
+        if(p instanceof King && destino.getColuna() == origem.getColuna() -2){
+            Position sT = new Position(origem.getLinha(), origem.getColuna() -4);
+            Position tT = new Position(origem.getLinha(), origem.getColuna() -1);
+            ChessPiece rook = (ChessPiece)board.removePiece(tT);
+            board.placePiece(rook, sT);
+            rook.minusMove();
+        }
+        // ESTUDAR MOVIMENTO ESPECIAL DE ROCADA!
     }
 
     private Color oponente(Color c){
@@ -142,6 +188,39 @@ public class ChessMatch {
 
         }
         throw new IllegalStateException("Erro. Não há rei " + color + " no tabuleiro.");
+
+    }
+
+    private boolean testeChequeMate(Color c){
+        if(!testeChuca(c)){
+            return false;
+        }
+
+        List<Piece> aux = pecasTabuleiro.stream().filter(x -> ((ChessPiece)x).getColor() == c).collect(Collectors.toList());
+        for(Piece p : aux){
+            boolean[][] mat = p.possiveisMovimentos();
+            for(int i = 0; i < board.getLinhas(); i++){
+                for(int j = 0; j < board.getColunas(); j++){
+                    if(mat[i][j]){ // É um movimento possível?
+                        // Esse movimento possível tira do cheque?
+                        Position source = ((ChessPiece)p).getChessPosition().toPosition();
+                        Position target = new Position (i,j);
+                        Piece cap = makeMove(source,target);
+                        boolean testCheck = testeChuca(c);
+                        undoMove(source,target,cap);
+
+                        if(!testCheck){ // Se o teste for false então o if se torna verdadeiro.
+                            return false;
+                        }
+
+                    }
+                }
+            }
+
+            // ANALISAR LÓGICA DE CHEQUEMATE
+        }
+
+        return true;
 
     }
 
@@ -180,17 +259,38 @@ public class ChessMatch {
         //board.placePiece(new Rook(board,Color.WHITE),new Position(2,1));
         //board.placePiece(new King(board,Color.BLACK),new Position(2,1));
         //board.placePiece(new King(board,Color.BLACK),new Position(9,4));
-        placeNewPiece('c',1,new Rook(board,Color.WHITE));
-        placeNewPiece('c',2,new Rook(board,Color.WHITE));
-        placeNewPiece('d',2,new Rook(board,Color.WHITE));
-        placeNewPiece('e',2,new Rook(board,Color.WHITE));
-        placeNewPiece('e',1,new Rook(board,Color.WHITE));
-        placeNewPiece('d',1,new King(board,Color.WHITE));
-        placeNewPiece('c',7,new Rook(board,Color.BLACK));
-        placeNewPiece('c',8,new Rook(board,Color.BLACK));
-        placeNewPiece('d',7,new Rook(board,Color.BLACK));
-        placeNewPiece('e',7,new Rook(board,Color.BLACK));
-        placeNewPiece('e',8,new Rook(board,Color.BLACK));
-        placeNewPiece('d',8,new King(board,Color.BLACK));
+        placeNewPiece('a',1,new Rook(board,Color.WHITE));
+        placeNewPiece('e',1,new King(board,Color.WHITE, this));
+        placeNewPiece('h',1,new Rook(board,Color.WHITE));
+        placeNewPiece('c',1,new Bishop(board,Color.WHITE));
+        placeNewPiece('f',1,new Bishop(board,Color.WHITE));
+        placeNewPiece('a',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('b',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('c',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('d',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('e',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('f',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('g',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('h',2,new Pawn(board,Color.WHITE));
+        placeNewPiece('b',1,new Knight(board,Color.WHITE));
+        placeNewPiece('g',1,new Knight(board,Color.WHITE));
+        placeNewPiece('d',1,new Queen(board,Color.WHITE));
+
+        placeNewPiece('a',8,new Rook(board,Color.BLACK));
+        placeNewPiece('e',8,new King(board,Color.BLACK, this));
+        placeNewPiece('h',8,new Rook(board,Color.BLACK));
+        placeNewPiece('c',8,new Bishop(board,Color.BLACK));
+        placeNewPiece('f',8,new Bishop(board,Color.BLACK));
+        placeNewPiece('a',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('b',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('c',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('d',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('e',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('f',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('g',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('h',7,new Pawn(board,Color.BLACK));
+        placeNewPiece('b',8,new Knight(board,Color.BLACK));
+        placeNewPiece('g',8,new Knight(board,Color.BLACK));
+        placeNewPiece('d',8,new Queen(board,Color.BLACK));
     }
 }

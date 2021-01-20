@@ -6,6 +6,7 @@ import boardgame.Position;
 
 public abstract class ChessPiece extends Piece{
     private Color color;
+    private int contagemMov;
 
     public ChessPiece(Board board, Color color) {
         super(board);
@@ -13,6 +14,17 @@ public abstract class ChessPiece extends Piece{
     }
     public Color getColor(){
         return color;
+    }
+
+    public void plusMove (){
+        contagemMov++;
+    }
+    public void minusMove(){
+        contagemMov--;
+    }
+
+    public int getContagemMov(){
+        return contagemMov;
     }
 
     protected boolean haUmaPecaInimiga(Position p){

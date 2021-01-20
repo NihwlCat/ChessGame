@@ -73,9 +73,14 @@ public class UI {
         printPecasCapturadas(cap);
         System.out.println();
         System.out.println("Turno: " + cm.getTurn());
-        System.out.println("Esperando jogada... " + cm.getJogAtual());
-        if(cm.getCheque()){
-            System.out.println("CHEQUE!");
+        if(!cm.getChequeMate()) {
+            System.out.println("Esperando jogada... " + cm.getJogAtual());
+            if (cm.getCheque()) {
+                System.out.println("CHEQUE!");
+            }
+        } else {
+            System.out.println("CHEQUEMATE!");
+            System.out.println("VENCEDOR: " + cm.getJogAtual());
         }
     }
 
