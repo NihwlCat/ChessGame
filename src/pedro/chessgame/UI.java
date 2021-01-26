@@ -1,5 +1,6 @@
 package pedro.chessgame;
 
+import boardgame.ChessException;
 import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -122,7 +123,7 @@ public class UI {
         List<ChessPiece> brancas = capturadas.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
         List<ChessPiece> pretas = capturadas.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
 
-        System.out.println("PEÇAS CAPTURADAS: ");
+        System.out.println("CAPTURADAS: ");
         System.out.print("BRANCAS: ");
         System.out.print(ANSI_WHITE);
         System.out.println(Arrays.toString((brancas.toArray())));

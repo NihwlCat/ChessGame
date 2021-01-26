@@ -36,6 +36,11 @@ public class Application {
                 if (capturada != null){
                     capturadas.add(capturada);
                 }
+                if(cm.getPromocao() != null){
+                    System.out.println("Insera a peca a ser promovida (B/N/R/Q)");
+                    String t = sc.nextLine();
+                    cm.replacePiece(t);
+                }
             } catch (ChessException e) {
                 System.out.println(e.getMessage());
                 sc.nextLine();
