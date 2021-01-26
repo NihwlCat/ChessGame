@@ -6,6 +6,7 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.Rook;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -37,9 +38,14 @@ public class Application {
                     capturadas.add(capturada);
                 }
                 if(cm.getPromocao() != null){
-                    System.out.println("Insera a peca a ser promovida (B/N/R/Q)");
-                    String t = sc.nextLine();
-                    cm.replacePiece(t);
+                    System.out.print("Insera a peca a ser promovida (B/N/R/Q)");
+                    String tipo = sc.nextLine().toUpperCase();
+                    while(!tipo.equals("B") && !tipo.equals("N") && !tipo.equals("R") && !tipo.equals("Q")){
+                        System.out.println("Entrada invalida, insira novamente");
+                        tipo = sc.nextLine().toUpperCase();
+                        // Substitui exceção!
+                    }
+                    cm.replacePiece(tipo);
                 }
             } catch (ChessException e) {
                 System.out.println(e.getMessage());
